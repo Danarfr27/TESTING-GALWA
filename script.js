@@ -1,4 +1,4 @@
-// Sample Data
+// ===== DATA =====
 const chatsData = [
     { id: 1, name: 'Sarah Johnson', avatar: 'https://i.pravatar.cc/150?img=1', message: 'Hey! How are you?', time: '10:30', unread: 2, online: true },
     { id: 2, name: 'Mike Chen', avatar: 'https://i.pravatar.cc/150?img=2', message: 'See you tomorrow!', time: '09:15', unread: 0, online: true },
@@ -47,7 +47,7 @@ const messagesData = {
 
 let currentChatId = null;
 
-// DOM Elements
+// ===== DOM ELEMENTS =====
 const chatList = document.getElementById('chatList');
 const messagesArea = document.getElementById('messagesArea');
 const messageInput = document.getElementById('messageInput');
@@ -60,38 +60,47 @@ const chatAvatar = document.getElementById('chatAvatar');
 const searchInput = document.getElementById('searchInput');
 const parallaxBg = document.getElementById('parallaxBg');
 
-// Initialize
+// ===== INITIALIZE =====
 function init() {
     renderChatList();
     setupEventListeners();
     setupParallax();
+    console.log('🚀 WhatsApp Clone Ready!');
 }
 
-// Render Chat List
+// ===== RENDER CHAT LIST =====
 function renderChatList(filteredChats = chatsData) {
     chatList.innerHTML = '';
     
     filteredChats.forEach(chat => {
         const chatItem = document.createElement('div');
         chatItem.className = `chat-item ${chat.id === currentChatId ? 'active' : ''}`;
+        
+        const unreadClass = chat.unread > 0 ? 'style="font-weight: 600;"' : '';
+        const onlineIndicator = chat.online ? '<span class="online-indicator"></span>' : '';
+        
         chatItem.innerHTML = `
-            <img src="${chat.avatar}" alt="${chat.name}" class="avatar">
+            <div style="position: relative;">
+                <img src="${chat.avatar}" alt="${chat.name}" class="avatar">
+                ${onlineIndicator}
+            </div>
             <div class="chat-item-content">
                 <div class="chat-item-header">
                     <span class="chat-item-name">${chat.name}</span>
                     <span class="chat-item-time">${chat.time}</span>
                 </div>
-                <div class="chat-item-message">${chat.message}</div>
+                <div class="chat-item-message" ${unreadClass}>${chat.message}</div>
             </div>
+            ${chat.unread > 0 ? `<span class="unread-badge">${chat.unread}</span>` : ''}
         `;
         
-        chatItem.addEventListener('click', () => openChat(chat));
+        chatItem.addEventListener('click', () => openChat(chat, chatItem));
         chatList.appendChild(chatItem);
     });
 }
 
-// Open Chat
-function openChat(chat) {
+// ===== OPEN CHAT =====
+function openChat(chat, chatItemElement) {
     currentChatId = chat.id;
     
     // Update UI
@@ -100,7 +109,7 @@ function openChat(chat) {
     
     // Update header
     chatName.textContent = chat.name;
-    chatStatus.textContent = chat.online ? 'Online' : 'Offline';
+    chatStatus.textContent = chat.online ? '🟢 Online' : '⚫ Offline';
     chatAvatar.src = chat.avatar;
     
     // Render messages
@@ -110,33 +119,41 @@ function openChat(chat) {
     document.querySelectorAll('.chat-item').forEach(item => {
         item.classList.remove('active');
     });
-    event.currentTarget.classList.add('active');
+    if (chatItemElement) {
+        chatItemElement.classList.add('active');
+    }
     
     // Focus input
     setTimeout(() => messageInput.focus(), 100);
 }
 
-// Render Messages
+// ===== RENDER MESSAGES =====
 function renderMessages() {
     if (!currentChatId) return;
     
     messagesArea.innerHTML = '';
     const messages = messagesData[currentChatId] || [];
     
-    messages.forEach(msg => {
+    messages.forEach((msg, index) => {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${msg.sent ? 'sent' : 'received'}`;
+        messageDiv.style.animationDelay = `${index * 50}ms`;
+        
         messageDiv.innerHTML = `
             <div class="message-content">${msg.text}</div>
+            <div class="message-time">${msg.time}</div>
         `;
+        
         messagesArea.appendChild(messageDiv);
     });
     
     // Scroll to bottom
-    messagesArea.scrollTop = messagesArea.scrollHeight;
+    setTimeout(() => {
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }, 50);
 }
 
-// Send Message
+// ===== SEND MESSAGE =====
 function sendMessage() {
     const text = messageInput.value.trim();
     
@@ -164,7 +181,7 @@ function sendMessage() {
     // Re-render messages
     renderMessages();
     
-    // Simulate reply
+    // Simulate reply after random delay
     setTimeout(() => {
         const replies = [
             'That sounds great!',
@@ -174,26 +191,33 @@ function sendMessage() {
             'Perfect!',
             'Looking forward to it!',
             'Sounds good to me',
-            'Got it! 😊'
+            'Got it! 😊',
+            'Haha, I like that!',
+            'Let me think about it...',
+            'Sure thing! 🎉'
         ];
         
         const randomReply = replies[Math.floor(Math.random() * replies.length)];
+        
+        const replyTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
         
         messagesData[currentChatId].push({
             id: messagesData[currentChatId].length + 1,
             text: randomReply,
             sent: false,
-            time: time
+            time: replyTime
         });
         
         renderMessages();
     }, 1000 + Math.random() * 2000);
 }
 
-// Setup Event Listeners
+// ===== SETUP EVENT LISTENERS =====
 function setupEventListeners() {
+    // Send button
     sendBtn.addEventListener('click', sendMessage);
     
+    // Enter key to send
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -201,6 +225,7 @@ function setupEventListeners() {
         }
     });
     
+    // Auto-resize textarea
     messageInput.addEventListener('input', () => {
         messageInput.style.height = 'auto';
         messageInput.style.height = Math.min(messageInput.scrollHeight, 100) + 'px';
@@ -225,10 +250,13 @@ function setupEventListeners() {
             let filtered = chatsData;
             
             if (index === 1) {
+                // Unread
                 filtered = chatsData.filter(chat => chat.unread > 0);
             } else if (index === 2) {
+                // Favorites
                 filtered = chatsData.slice(0, 3);
             } else if (index === 3) {
+                // Groups
                 filtered = chatsData.filter(chat => chat.name.includes('Team') || chat.name.includes('Group'));
             }
             
@@ -237,7 +265,7 @@ function setupEventListeners() {
     });
 }
 
-// Parallax Effect
+// ===== PARALLAX EFFECT =====
 function setupParallax() {
     window.addEventListener('mousemove', (e) => {
         const x = (window.innerWidth - e.clientX * 2) / 100;
@@ -246,22 +274,71 @@ function setupParallax() {
         parallaxBg.style.transform = `translateZ(0) translate(${x * 0.5}px, ${y * 0.5}px)`;
     });
     
-    // Mobile parallax
-    window.addEventListener('deviceorientation', (e) => {
-        const x = e.gamma || 0;
-        const y = e.beta || 0;
-        
-        parallaxBg.style.transform = `translateZ(0) translate(${x * 0.3}px, ${y * 0.3}px)`;
-    });
+    // Mobile parallax with device orientation
+    if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', (e) => {
+            const x = e.gamma || 0;
+            const y = e.beta || 0;
+            
+            parallaxBg.style.transform = `translateZ(0) translate(${x * 0.3}px, ${y * 0.3}px)`;
+        });
+    }
+    
+    // Floating animation for background
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(20px); }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
-// Initialize App
-init();
+// ===== ADDITIONAL STYLES FOR ONLINE INDICATOR =====
+const additionalStyles = document.createElement('style');
+additionalStyles.textContent = `
+    .online-indicator {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 14px;
+        height: 14px;
+        background: #31a24c;
+        border: 3px solid white;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    .unread-badge {
+        background: #128C7E;
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 600;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+`;
+document.head.appendChild(additionalStyles);
 
-// Add some interactivity
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('WhatsApp Clone Ready!');
-    console.log('🎨 Modern UI with Parallax Effects');
-    console.log('💬 Real-time messaging simulation');
-    console.log('📱 Fully responsive design');
-});
+// ===== START APPLICATION =====
+document.addEventListener('DOMContentLoaded', init);
+
+// ===== CONSOLE MESSAGES =====
+console.log('%c🎨 WhatsApp Clone - Premium Edition', 'font-size: 16px; color: #128C7E; font-weight: bold;');
+console.log('%c✅ Parallax Effects Enabled', 'color: #31a24c;');
+console.log('%c✅ Real-time Messaging Active', 'color: #31a24c;');
+console.log('%c✅ Fully Responsive Design', 'color: #31a24c;');
+console.log('%c✅ No License Restrictions', 'color: #31a24c;');
+console.log('%c💡 Tip: Click any chat to start messaging!', 'color: #666; font-style: italic;');
