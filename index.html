@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Clone - Chat Application</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Parallax Background -->
+    <div class="parallax-bg" id="parallaxBg"></div>
+    
+    <div class="container">
+        <!-- Sidebar (Chat List) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Chat</h1>
+                <div class="header-actions">
+                    <button class="icon-btn" title="Komunitas">
+                        <i class="fas fa-people-group"></i>
+                    </button>
+                    <button class="icon-btn" title="Menu">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Cari atau mulai chat baru" id="searchInput">
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="tab-btn active">Semua</button>
+                <button class="tab-btn">Belum dibaca</button>
+                <button class="tab-btn">Favorit</button>
+                <button class="tab-btn">Grup</button>
+            </div>
+
+            <!-- Chat List -->
+            <div class="chat-list" id="chatList">
+                <!-- Chat items akan di-generate oleh JavaScript -->
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <div class="empty-state" id="emptyState">
+                <div class="empty-state-content">
+                    <i class="fas fa-comments"></i>
+                    <h2>WhatsApp Clone</h2>
+                    <p>Pilih chat untuk memulai percakapan</p>
+                </div>
+            </div>
+
+            <!-- Chat Window -->
+            <div class="chat-window" id="chatWindow" style="display: none;">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <div class="chat-info">
+                        <img class="avatar" id="chatAvatar" src="" alt="">
+                        <div class="chat-details">
+                            <h3 id="chatName">Chat Name</h3>
+                            <p id="chatStatus">Online</p>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="icon-btn"><i class="fas fa-phone"></i></button>
+                        <button class="icon-btn"><i class="fas fa-video"></i></button>
+                        <button class="icon-btn"><i class="fas fa-search"></i></button>
+                        <button class="icon-btn"><i class="fas fa-ellipsis-v"></i></button>
+                    </div>
+                </div>
+
+                <!-- Messages Area -->
+                <div class="messages-area" id="messagesArea">
+                    <!-- Messages akan di-generate oleh JavaScript -->
+                </div>
+
+                <!-- Message Input -->
+                <div class="message-input-area">
+                    <button class="input-btn"><i class="fas fa-plus"></i></button>
+                    <div class="input-wrapper">
+                        <input type="text" placeholder="Aa" id="messageInput" class="message-input">
+                        <button class="emoji-btn"><i class="fas fa-face-smile"></i></button>
+                    </div>
+                    <button class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
